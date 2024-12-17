@@ -25,26 +25,28 @@ export default function gameNormal() {
   function gameStart() {
     game.style.gridTemplateColumns = '1fr 1fr 1fr'
     game.style.gridTemplateRows = '1fr 1fr 1fr'
-    let i = -1
     for (let i = 0; i < campoGame.length; i++) {
       campoGame[i] = ''
     }
     game.innerHTML = ''
-    campoGame.forEach(elemento => {
-      
+
+    let quadrado = -1
+    campoGame.forEach(() => {
       game.innerHTML += `
-          <span class='campo' btn='${++i}'>${elemento}</span>
+          <span class='campo campoHover' btn='${++quadrado}'></span>
         `
     })
     vezDoPlayer()
   }
 
   function vezDoPlayer() {
+    const campos = document.querySelectorAll('.campo')
+
     win = testaSePlayerGanhou()
-    win !== true ? playerPodeJogar() : endGameWin()
+    win !== true ? playerPodeJogar(campos) : endGameWin(campos)
   }
 
-  function playerPodeJogar() {
+  function playerPodeJogar(campos) {
     const campo = document.querySelectorAll('.campo')
     campo.forEach(elemento => {
       elemento.addEventListener('click', () => {
@@ -54,7 +56,7 @@ export default function gameNormal() {
             campoGame[elemento.getAttribute('btn')] = player.player
             elemento.innerHTML = campoGame[elemento.getAttribute('btn')]
             const testDraw = campoGame.filter(e => e === '')
-            testDraw.length === 0 ? endGameDraw() : vezDoPlayer()
+            testDraw.length === 0 ? endGameDraw(campos) : vezDoPlayer()
           }
         }
       })
@@ -70,37 +72,50 @@ export default function gameNormal() {
     }
   }
 
-  function endGameDraw() {
-    game.innerHTML = `
-          <div class='winner'>
-            <p><strong>EMPATE!</strong></p>
-            <button>JOGAR NOVAMENTE</button>
-          </div>
-        `
-    refreshGame()
+  function endGameDraw(campos) {
+    campos.forEach(campo => campo.className = 'campo campoDraw')
+    setTimeout(() => {
+      game.innerHTML = `
+            <div class='winner'>
+              <p><strong>EMPATE!</strong></p>
+              <button>JOGAR NOVAMENTE</button>
+            </div>
+          `
+      refreshGame()
+    }, 2000)
   }
 
-  function endGameWin() {
-    game.innerHTML = `
-      <div class='winner'>
-        <p>JOGADOR <strong>${player.player}</strong> GANHOU!</p>
-        <button>JOGAR NOVAMENTE</button>
-      </div>
-    `
-    player.pontos += 1
-    player === players[0] ? player = players[1] : player = players[0]
-    scoreP1.innerHTML = `${players[0].player} = ${players[0].pontos} pontos.`
-    scoreP2.innerHTML = `${players[1].player} = ${players[1].pontos} pontos.`
-    refreshGame()
+  function endGameWin(campos) {
+    campos.forEach(campo => campo.className="campo")
+    setTimeout(() =>{
+      game.innerHTML = `
+        <div class='winner'>
+          <p>JOGADOR <strong>${player.player}</strong> GANHOU!</p>
+          <button>JOGAR NOVAMENTE</button>
+        </div>
+      `
+      player.pontos += 1
+      player === players[0] ? player = players[1] : player = players[0]
+      scoreP1.innerHTML = `${players[0].player} = ${players[0].pontos} pontos.`
+      scoreP2.innerHTML = `${players[1].player} = ${players[1].pontos} pontos.`
+      refreshGame()
+    }, 2000)
   }
 
   function testaSePlayerGanhou() {
+
     for (let i = 0; i < winnerList.length; i++) {
+      let indicesMarcados = [ winnerList[i][0], winnerList[i][1], winnerList[i][2] ]
+      let posicoesMarcadas = indicesMarcados.map(posicao => campoGame[posicao])
 
-      if (campoGame[winnerList[i][0]] === player.player &&
-        campoGame[winnerList[i][1]] === player.player &&
-        campoGame[winnerList[i][2]] === player.player) {
-
+      if (posicoesMarcadas.every( marcacao => marcacao === player.player )) {
+          // campo.forEach( el => {
+          //   el.getAttribute('btn')
+          // })
+          indicesMarcados.forEach(posicao => {
+            const btn = document.querySelector(`[btn="${posicao}"]`)
+            btn.style.backgroundColor = "#ec9c07"
+          })
         return true
       }
     }
