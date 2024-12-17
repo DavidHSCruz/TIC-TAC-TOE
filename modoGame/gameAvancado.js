@@ -28,7 +28,7 @@ export default function gameAvancado() {
     for (let x = 0; x < campoGame.length; x++) {
       campoGame[x].forEach(elemento => {
         game.innerHTML += `
-                    <span class='campo' linha='${x}' coluna='${i}'>${elemento}</span>
+                    <span class='campo campoHover' linha='${x}' coluna='${i}'>${elemento}</span>
                   `
         i < campoGame[0].length - 1 ? i++ : i = 0
       })
@@ -53,7 +53,7 @@ export default function gameAvancado() {
       elemento.addEventListener('click', el => {
         !playerWin ? playerPodeJogar(playerWin, el) : null
         playerWin = playerWinTest(playerWin)
-        player === players[0] ? player = players[1] : player = players[0]
+        if(!playerWin) player === players[0] ? player = players[1] : player = players[0]
         testValorCampo() ? criaNovoCampo(el, playerWin) : null
       })
     })
@@ -106,7 +106,6 @@ export default function gameAvancado() {
   }
 
   function testValorCampo() {
-    console.log(campoGame)
     let camposPreenchidos = new Array(campoGame.length).fill(false)
     for (let linha = 0; linha < campoGame.length; linha++) {
       const filtro = campoGame[linha].filter(e => e === '')
@@ -117,8 +116,7 @@ export default function gameAvancado() {
   }
 
   function playerPodeJogar(playerWin, e) {
-
-    if (playerWin !== true) {
+    if (!playerWin) {
       const linhaBloco = e.target.getAttribute('linha')
       const colunaBloco = e.target.getAttribute('coluna')
       e.target.innerHTML === '' ? campoGame[linhaBloco][colunaBloco] = player.player : ''
@@ -147,26 +145,28 @@ export default function gameAvancado() {
     refreshGame()
   }
 
-  function endGameWin() {
-    game.innerHTML = `
-      <div class='winner'>
-        <p>JOGADOR <strong>${player.player}</strong> GANHOU!</p>
-        <button>JOGAR NOVAMENTE</button>
-      </div>
-    `
-    player.pontos += 1
-    player === players[0] ? player = players[1] : player = players[0]
-    scoreP1.innerHTML = `${players[0].player} = ${players[0].pontos} pontos.`
-    scoreP2.innerHTML = `${players[1].player} = ${players[1].pontos} pontos.`
-    refreshGame()
+  function endGameWin(campos) {
+    campos.forEach(campo => campo.className="campo")
+    setTimeout(() => {
+      game.innerHTML = `
+        <div class='winner'>
+          <p>JOGADOR <strong>${player.player}</strong> GANHOU!</p>
+          <button>JOGAR NOVAMENTE</button>
+        </div>
+      `
+      player.pontos += 1
+      scoreP1.innerHTML = `${players[0].player} = ${players[0].pontos} pontos.`
+      scoreP2.innerHTML = `${players[1].player} = ${players[1].pontos} pontos.`
+      refreshGame()
+    }, 2000)
   }
 
   function playerWinTest(playerWin) {
+    let campos = document.querySelectorAll('.campo')
     let tamanho = {
       n_linhas: campoGame.length,
       n_colunas: campoGame[0].length
     }
-    let linha = 0
 
     function testLinhas() {
       for (let linha = 0; linha < tamanho.n_linhas; linha++) {
@@ -219,7 +219,7 @@ export default function gameAvancado() {
     testColunas()
     testDiagonal()
 
-    playerWin && endGameWin()
+    playerWin && endGameWin(campos)
     return playerWin
   }
 
