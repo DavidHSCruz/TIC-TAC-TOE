@@ -53,8 +53,10 @@ export default function gameAvancado() {
       elemento.addEventListener('click', el => {
         !playerWin ? playerPodeJogar(playerWin, el) : null
         playerWin = playerWinTest(playerWin)
-        if(!playerWin) player === players[0] ? player = players[1] : player = players[0]
-        testValorCampo() ? criaNovoCampo(el, playerWin) : null
+        if(!playerWin) {
+          player === players[0] ? player = players[1] : player = players[0]
+          testValorCampo() ? criaNovoCampo(el, playerWin) : null
+        } 
       })
     })
   }
@@ -167,54 +169,94 @@ export default function gameAvancado() {
       n_linhas: campoGame.length,
       n_colunas: campoGame[0].length
     }
+    let linha = 0
+    let coluna = 0
+    let win = 0
+    let marcacoes = []
 
+    function testWin() {
+      marcacoes.push([linha, coluna])
+      campoGame[linha][coluna] === player.player ? win++ : win = 0
+
+      if(win >= 3 && campoGame[linha][coluna] === player.player) {
+        let x = marcacoes.length - 1
+        let y = marcacoes[0].length - 1
+        let btns = [
+          document.querySelector(`[linha="${marcacoes[x-2][y-1]}"][coluna="${marcacoes[x-2][y]}"]`),
+          document.querySelector(`[linha="${marcacoes[x-1][y-1]}"][coluna="${marcacoes[x-1][y]}"]`),
+          document.querySelector(`[linha="${marcacoes[x][y-1]}"][coluna="${marcacoes[x][y]}"]`)
+        ]
+        btns.forEach(btn => btn.style.backgroundColor = "#ec9c07")
+
+        playerWin = true
+      }
+    }
+    
     function testLinhas() {
-      for (let linha = 0; linha < tamanho.n_linhas; linha++) {
-        let win = 0
-        campoGame[linha].forEach(e => e === player.player ? win++ : win = 0)
-        win >= 3 ? playerWin = true : ''
+      linha = 0
+
+      while(linha < tamanho.n_linhas) {
+        win = 0
+        coluna = 0
+
+        while(coluna < tamanho.n_colunas) {
+          testWin()
+          
+          coluna++
+        }
+        marcacoes = []
+        linha++
       }
     }
 
     function testColunas() {
-      for (let coluna = 0; coluna < tamanho.n_colunas; coluna++) {
-        let win = 0
-        for (let linha = 0; linha < tamanho.n_linhas; linha++) {
-          campoGame[linha][coluna] === player.player ? win++ : win = 0
-          win >= 3 ? playerWin = true : ''
+      coluna = 0
+
+      while(coluna < tamanho.n_colunas) {
+        win = 0
+        linha = 0
+
+        while(linha < tamanho.n_linhas) {
+          testWin()
+          
+          linha++
         }
+        marcacoes = []
+        coluna++
       }
+
+      
     }
 
     function testDiagonal() {
       let refLinha = 0
-      let linha = 0
-      let coluna = 0
 
-      for (refLinha; refLinha < tamanho.n_linhas; refLinha++) {
-        let win = 0
+      while(refLinha < tamanho.n_linhas) {
+        win = 0
         linha = 0 + refLinha
         coluna = 0
-        for (linha; linha < tamanho.n_linhas; linha++) {
-          campoGame[linha][coluna] === player.player ? win++ : win = 0
+        
+        while (linha < tamanho.n_linhas) {
+          testWin()
+
+          linha++
           coluna++
-          win >= 3 ? playerWin = true : ''
         }
-
-      }
-      refLinha = 0
-
-      for (refLinha; refLinha < tamanho.n_linhas; refLinha++) {
-        let win = 0
+        win = 0
         linha = 0 + refLinha
         coluna = tamanho.n_colunas - 1
-        for (linha; linha < tamanho.n_linhas; linha++) {
-          campoGame[linha][coluna] === player.player ? win++ : win = 0
+        
+        while(linha < tamanho.n_linhas) {
+          testWin()
+          
+          linha++
           coluna--
-          win >= 3 ? playerWin = true : ''
         }
+        marcacoes = []
+        refLinha++
       }
     }
+
     testLinhas()
     testColunas()
     testDiagonal()
