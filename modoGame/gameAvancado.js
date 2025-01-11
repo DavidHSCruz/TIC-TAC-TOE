@@ -65,25 +65,29 @@ export default function gameAvancado() {
     const linhaBloco = parseInt(e.target.getAttribute('linha'))
     const colunaBloco = parseInt(e.target.getAttribute('coluna'))
     const bloco = document.querySelector(`[linha='${linhaBloco}'][coluna='${colunaBloco}']`)
+    let tamanho = {
+      n_linhas: campoGame.length - 1,
+      n_colunas: campoGame[0].length - 1
+    }
     tiraValoresCampo(linhaBloco, colunaBloco, e)
 
-    if (linhaBloco <= 2 && colunaBloco === 0) {
+    if (linhaBloco <= tamanho.n_linhas && colunaBloco === 0) {
       for (let linha = 0; linha < campoGame.length; linha++) {
         campoGame[linha].push('')
       }
     }
-    if (linhaBloco <= 2 && colunaBloco === 2) {
+    if (linhaBloco <= tamanho.n_linhas && colunaBloco === tamanho.n_colunas) {
       for (let linha = 0; linha < campoGame.length; linha++) {
         campoGame[linha].unshift('')
       }
     }
-    if (linhaBloco === 0 && colunaBloco <= 2) {
+    if (linhaBloco === 0 && colunaBloco <= tamanho.n_colunas) {
       campoGame.push(new Array(campoGame[0].length).fill(''))
     }
-    if (linhaBloco === 2 && colunaBloco <= 2) {
+    if (linhaBloco === tamanho.n_linhas && colunaBloco <= tamanho.n_colunas) {
       campoGame.unshift(new Array(campoGame[0].length).fill(''))
     }
-    if (linhaBloco === 1 && colunaBloco === 1) {
+    if (linhaBloco === tamanho.n_linhas/2 && colunaBloco === tamanho.n_colunas/2) {
       for (let linha = 0; linha < campoGame.length; linha++) {
         campoGame[linha].push('')
         campoGame[linha].unshift('')
