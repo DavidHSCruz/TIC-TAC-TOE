@@ -1,4 +1,4 @@
-export default function gameNormal() {
+export default function gameNormal(audioClick, audioWin, audioDraw) {
   const score = document.querySelector('.SCORE')
   const game = document.querySelector('.GAME')
 
@@ -51,6 +51,7 @@ export default function gameNormal() {
     campo.forEach(elemento => {
       elemento.addEventListener('click', () => {
         if (win !== true) {
+          audioClick.play()
           if (campoGame[elemento.getAttribute('btn')] === '') {
             player === players[0] ? player = players[1] : player = players[0]
             campoGame[elemento.getAttribute('btn')] = player.player
@@ -62,42 +63,57 @@ export default function gameNormal() {
       })
     })
   }
-
+  
+  function menuPrincipal() {
+    const menuPrincipal = document.querySelector('.btnMenuPrincipal')
+    menuPrincipal.onclick = () => {
+      audioClick.play()
+      location.reload()
+    }
+  }
+  
   function refreshGame() {
     game.style.gridTemplateColumns = '1fr'
     game.style.gridTemplateRows = '1fr'
-    const reloadGame = document.querySelector('button')
+    const reloadGame = document.querySelector('.btnJogarNovamente')
     reloadGame.onclick = () => {
+      audioClick.play()
       gameStart()
     }
   }
 
   function endGameDraw(campos) {
+    audioDraw.play()
     campos.forEach(campo => campo.className = 'campo campoDraw')
     setTimeout(() => {
       game.innerHTML = `
             <div class='winner'>
               <p><strong>EMPATE!</strong></p>
-              <button>JOGAR NOVAMENTE</button>
+              <button class='btnJogarNovamente'>JOGAR NOVAMENTE</button> 
+              <button class='btnMenuPrincipal'>MENU PRINCIPAL</button>
             </div>
-          `
+        `
+      menuPrincipal()
       refreshGame()
     }, 2000)
   }
 
   function endGameWin(campos) {
+    audioWin.play()
     campos.forEach(campo => campo.className="campo")
     setTimeout(() =>{
       game.innerHTML = `
         <div class='winner'>
           <p>JOGADOR <strong>${player.player}</strong> GANHOU!</p>
-          <button>JOGAR NOVAMENTE</button>
+              <button class='btnJogarNovamente'>JOGAR NOVAMENTE</button> 
+              <button class='btnMenuPrincipal'>MENU PRINCIPAL</button>
         </div>
       `
       player.pontos += 1
       player === players[0] ? player = players[1] : player = players[0]
       scoreP1.innerHTML = `${players[0].player} = ${players[0].pontos} pontos.`
       scoreP2.innerHTML = `${players[1].player} = ${players[1].pontos} pontos.`
+      menuPrincipal()
       refreshGame()
     }, 2000)
   }

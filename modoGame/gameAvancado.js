@@ -1,4 +1,4 @@
-export default function gameAvancado() {
+export default function gameAvancado(audioClick, audioWin, audioDraw) {
   const score = document.querySelector('.SCORE')
   const game = document.querySelector('.GAME')
 
@@ -51,9 +51,11 @@ export default function gameAvancado() {
     const campo = document.querySelectorAll('.campo')
     campo.forEach(elemento => {
       elemento.addEventListener('click', el => {
+        
         !playerWin ? playerPodeJogar(playerWin, el) : null
         playerWin = playerWinTest(playerWin)
         if(!playerWin) {
+          audioClick.play()
           player === players[0] ? player = players[1] : player = players[0]
           testValorCampo() ? criaNovoCampo(el, playerWin) : null
         } 
@@ -133,36 +135,36 @@ export default function gameAvancado() {
   function refreshGame() {
     game.style.gridTemplateColumns = '1fr'
     game.style.gridTemplateRows = '1fr'
-    const reloadGame = document.querySelector('button')
+    const reloadGame = document.querySelector('.btnJogarNovamente')
     reloadGame.onclick = () => {
+      audioClick.play()
       gameStart()
     }
   }
-
-  function endGameDraw() {
-    game.style.gridTemplateColumns = '1fr'
-    game.style.gridTemplateRows = '1fr'
-    game.innerHTML = `
-          <div class='winner'>
-            <p><strong>EMPATE!</strong></p>
-            <button>JOGAR NOVAMENTE</button>
-          </div>
-        `
-    refreshGame()
+  
+  function menuPrincipal() {
+    const menuPrincipal = document.querySelector('.btnMenuPrincipal')
+    menuPrincipal.onclick = () => {
+      audioClick.play()
+      location.reload()
+    }
   }
 
   function endGameWin(campos) {
+    audioWin.play()
     campos.forEach(campo => campo.className="campo")
     setTimeout(() => {
       game.innerHTML = `
         <div class='winner'>
           <p>JOGADOR <strong>${player.player}</strong> GANHOU!</p>
-          <button>JOGAR NOVAMENTE</button>
+          <button class='btnJogarNovamente'>JOGAR NOVAMENTE</button>
+          <button class='btnMenuPrincipal'>MENU PRINCIPAL</button>
         </div>
       `
       player.pontos += 1
       scoreP1.innerHTML = `${players[0].player} = ${players[0].pontos} pontos.`
       scoreP2.innerHTML = `${players[1].player} = ${players[1].pontos} pontos.`
+      menuPrincipal()
       refreshGame()
     }, 2000)
   }
@@ -234,11 +236,12 @@ export default function gameAvancado() {
 
     function testDiagonal() {
       let refLinha = 0
+      let refColuna = tamanho.n_colunas - 1
 
       while(refLinha < tamanho.n_linhas) {
         win = 0
         linha = 0 + refLinha
-        coluna = 0
+        coluna = 0 + refColuna
         
         while (linha < tamanho.n_linhas) {
           testWin()
@@ -248,7 +251,7 @@ export default function gameAvancado() {
         }
         win = 0
         linha = 0 + refLinha
-        coluna = tamanho.n_colunas - 1
+        coluna = tamanho.n_colunas - 1 - refColuna
         
         while(linha < tamanho.n_linhas) {
           testWin()
@@ -257,7 +260,7 @@ export default function gameAvancado() {
           coluna--
         }
         marcacoes = []
-        refLinha++
+        refColuna !== 0 ? refColuna-- : refLinha++
       }
     }
 
